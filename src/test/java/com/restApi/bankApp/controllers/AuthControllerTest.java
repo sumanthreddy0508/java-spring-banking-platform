@@ -35,13 +35,19 @@ class AuthControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
+    private Auth createAuth(String username, String password, String email) {
+        Auth auth = new Auth();
+        auth.setUsername(username);
+        auth.setPassword(password);
+        auth.setEmail(email);
+        return auth;
+    }
     @Test
     void getAllUsers_ShouldReturnListOfUsers() {
         // Arrange
         List<Auth> expectedUsers = Arrays.asList(
-            new Auth("user1", "pass1", "user1@test.com"),
-            new Auth("user2", "pass2", "user2@test.com")
+            createAuth("user1", "pass1", "user1@test.com"),
+            createAuth("user2", "pass2", "user2@test.com")
         );
         when(authService.getAllUsers()).thenReturn(expectedUsers);
 
@@ -58,7 +64,7 @@ class AuthControllerTest {
     @Test
     void register_ShouldReturnRegisteredUser() {
         // Arrange
-        Auth auth = new Auth("newuser", "password", "newuser@test.com");
+        Auth auth = createAuth("newuser", "password", "newuser@test.com");
         Account account = new Account();
         account.setId(1);
         auth.setAccount(account);
@@ -80,7 +86,7 @@ class AuthControllerTest {
     @Test
     void register_ShouldReturnBadRequest_WhenRegistrationFails() {
         // Arrange
-        Auth auth = new Auth("newuser", "password", "newuser@test.com");
+        Auth auth = createAuth("newuser", "password", "newuser@test.com");
         when(authService.register(any(Auth.class))).thenThrow(new RuntimeException("Registration failed"));
 
         // Act
@@ -97,7 +103,7 @@ class AuthControllerTest {
     @Test
     void login_ShouldReturnUser_WhenCredentialsAreValid() {
         // Arrange
-        Auth auth = new Auth("user", "password", "user@test.com");
+        Auth auth = createAuth("user", "password", "user@test.com");
         when(authService.login("user", "password")).thenReturn(Optional.of(auth));
 
         // Act
@@ -113,7 +119,7 @@ class AuthControllerTest {
     @Test
     void login_ShouldReturnBadRequest_WhenCredentialsAreInvalid() {
         // Arrange
-        Auth auth = new Auth("user", "wrongpassword", "user@test.com");
+        Auth auth = createAuth("user", "wrongpassword", "user@test.com");
         when(authService.login("user", "wrongpassword")).thenReturn(Optional.empty());
 
         // Act
@@ -130,7 +136,7 @@ class AuthControllerTest {
     void getUserByUsername_ShouldReturnUser_WhenUserExists() {
         // Arrange
         String username = "testuser";
-        Auth expectedUser = new Auth(username, "password", "test@test.com");
+        Auth expectedUser = createAuth(username, "password", "test@test.com");
         when(authService.getAuthByUsername(username)).thenReturn(Optional.of(expectedUser));
 
         // Act
@@ -162,7 +168,7 @@ class AuthControllerTest {
     void updateAuth_ShouldReturnUpdatedUser() {
         // Arrange
         int userId = 1;
-        Auth auth = new Auth("updateduser", "newpassword", "updated@test.com");
+        Auth auth = createAuth("updateduser", "newpassword", "updated@test.com");
         auth.setId(userId);
         when(authService.updateAuth(any(Auth.class))).thenReturn(auth);
 
@@ -180,7 +186,7 @@ class AuthControllerTest {
     void updateAuth_ShouldReturnBadRequest_WhenUpdateFails() {
         // Arrange
         int userId = 1;
-        Auth auth = new Auth("updateduser", "newpassword", "updated@test.com");
+        Auth auth = createAuth("updateduser", "newpassword", "updated@test.com");
         auth.setId(userId);
         when(authService.updateAuth(any(Auth.class))).thenThrow(new RuntimeException("Update failed"));
 
